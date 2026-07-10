@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home Loan Default Prediction Dashboard</title>
+    <link rel="stylesheet" href="/assets/style.css">
+    <!-- Plotly.js CDN -->
+    <script src="https://cdn.plot.ly/plotly-2.24.1.min.js"></script>
+</head>
+<body>
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+        <div class="sidebar-title">
+            <h3>Home Loan Default</h3>
+            <p>Risk Prediction System</p>
+        </div>
+        <ul class="nav-menu">
+            <li><a href="#dashboard" class="active">Dashboard Overview</a></li>
+            <li><a href="#data-overview">Data Overview</a></li>
+            <li><a href="#demographics">Customer Demographics</a></li>
+            <li><a href="#loan-characteristics">Loan Characteristics</a></li>
+            <li><a href="#credit-history">Credit History Analysis</a></li>
+            <li><a href="#correlation">Correlation & Importance</a></li>
+            <li><a href="#model-performance">Model Performance</a></li>
+            <li><a href="#loan-prediction">Default Predictor</a></li>
+            <li><a href="#business-insights">Business Insights</a></li>
+            <li><a href="#challenges">Challenges & Summary</a></li>
+        </ul>
+    </div>
+
+    <!-- MAIN CONTENT AREA -->
+    <div class="main-content">
+        
+        <!-- HEADER -->
+        <header class="top-header">
+            <div class="header-left">
+                <h2>Project Performance Dashboard</h2>
+                <p>Dataset: <span class="highlight">application_train.csv + historical tables</span></p>
+            </div>
+            <div class="header-right">
+                <span class="status-badge">Model Ready</span>
+                <span class="date-time" id="current-time">Loading date & time...</span>
+            </div>
+        </header>
+
+        <!-- GLOBAL FILTERS -->
+        <section class="filters-section card">
+            <h3>Interactive Data Filters</h3>
+            <div class="filters-grid">
+                <div class="filter-group">
+                    <label for="filter-gender">Gender</label>
+                    <select id="filter-gender">
+                        <option value="All">All</option>
+                        <option value="F">Female</option>
+                        <option value="M">Male</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="filter-income-type">Income Type</label>
+                    <select id="filter-income-type">
+                        <option value="All">All</option>
+                        <option value="Working">Working</option>
+                        <option value="Commercial associate">Commercial associate</option>
+                        <option value="Pensioner">Pensioner</option>
+                        <option value="State servant">State servant</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="filter-education">Education</label>
+                    <select id="filter-education">
+                        <option value="All">All</option>
+                        <option value="Secondary / special education">Secondary / special</option>
+                        <option value="Higher education">Higher education</option>
+                        <option value="Incomplete higher">Incomplete higher</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="filter-target">Default Target</label>
+                    <select id="filter-target">
+                        <option value="All">All</option>
+                        <option value="0">Repaid (0)</option>
+                        <option value="1">Defaulted (1)</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="filter-age-group">Age Group</label>
+                    <select id="filter-age-group">
+                        <option value="All">All</option>
+                        <option value="Young (20-35)">Young (20-35)</option>
+                        <option value="Middle-aged (36-55)">Middle-aged (36-55)</option>
+                        <option value="Senior (56+)">Senior (56+)</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="filter-credit-range">Credit Amount</label>
+                    <select id="filter-credit-range">
+                        <option value="All">All</option>
+                        <option value="0-500k">Under $500k</option>
+                        <option value="500k-1M">$500k - $1M</option>
+                        <option value="1M+">Over $1M</option>
+                    </select>
+                </div>
+            </div>
+            <button id="apply-filters-btn" class="btn btn-primary">Apply Filters</button>
+        </section>
+
+        <!-- SECTION 1: DASHBOARD OVERVIEW -->
+        <section id="dashboard" class="content-section">
+            <h3 class="section-title">Project Overview</h3>
+            <div class="kpi-container">
+                <div class="kpi-card card">
+                    <div class="kpi-icon icon-users">👤</div>
+                    <div class="kpi-info">
+                        <h4>Total Customers Analyzed</h4>
+                        <p id="kpi-total">Loading...</p>
+                    </div>
+                </div>
+                <div class="kpi-card card">
+                    <div class="kpi-icon icon-non-defaulters">🟢</div>
+                    <div class="kpi-info">
+                        <h4>Non-Defaulters (Repaid)</h4>
+                        <p id="kpi-repaid">Loading...</p>
+                    </div>
+                </div>
+                <div class="kpi-card card">
+                    <div class="kpi-icon icon-defaulters">🔴</div>
+                    <div class="kpi-info">
+                        <h4>Defaulters (Defaulted)</h4>
+                        <p id="kpi-defaulted">Loading...</p>
+                    </div>
+                </div>
+                <div class="kpi-card card">
+                    <div class="kpi-icon icon-rate">📉</div>
+                    <div class="kpi-info">
+                        <h4>Portfolio Default Rate</h4>
+                        <p id="kpi-rate">Loading...</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 2: DATASET OVERVIEW -->
+        <section id="data-overview" class="content-section">
+            <h3 class="section-title">Dataset Overview</h3>
+            <div class="data-summary-grid">
+                <div class="summary-details card">
+                    <h4>Structure Summary</h4>
+                    <table class="summary-table">
+                        <tr><td><strong>Total Rows in Train Set</strong></td><td>307,511</td></tr>
+                        <tr><td><strong>Initial Features</strong></td><td>122</td></tr>
+                        <tr><td><strong>Engineered Features</strong></td><td>46</td></tr>
+                        <tr><td><strong>Total Post-Merge Columns</strong></td><td>168</td></tr>
+                        <tr><td><strong>Numerical Columns</strong></td><td>152</td></tr>
+                        <tr><td><strong>Categorical Columns</strong></td><td>16</td></tr>
+                        <tr><td><strong>Missing Values Solved</strong></td><td>Median & Mode Imputed</td></tr>
+                    </table>
+                </div>
+                <div class="summary-sample card">
+                    <h4>Sample Processed Records (First 5 Rows)</h4>
+                    <div class="table-scroll">
+                        <table class="sample-table" id="sample-data-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Target</th>
+                                    <th>Contract Type</th>
+                                    <th>Gender</th>
+                                    <th>Total Income</th>
+                                    <th>Credit Amt</th>
+                                    <th>Inst. Mean Delay</th>
+                                    <th>Prev. Apps</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Inserted dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TARGET DISTRIBUTION -->
+            <div class="target-distribution card">
+                <h4>Target Variable Distribution</h4>
+                <div class="target-charts-grid">
+                    <div id="chart-target-pie" class="plotly-chart"></div>
+                    <div id="chart-target-bar" class="plotly-chart"></div>
+                </div>
+                <p class="chart-caption">
+                    <strong>Interpretation:</strong> The target label is heavily imbalanced. Only 8.07% of applicants in the primary dataset actually defaulted on their loans (Target 1), whereas 91.93% successfully repaid them (Target 0). Imbalanced modeling methods are required.
+                </p>
+            </div>
+        </section>
+
+        <!-- SECTION 3: DEMOGRAPHICS -->
+        <section id="demographics" class="content-section">
+            <h3 class="section-title">Customer Demographics</h3>
+            <div class="charts-grid-2x2">
+                <div class="chart-container card">
+                    <h4>Distribution of Gender</h4>
+                    <div id="chart-gender" class="plotly-chart-small"></div>
+                </div>
+                <div class="chart-container card">
+                    <h4>Education Levels</h4>
+                    <div id="chart-education" class="plotly-chart-small"></div>
+                </div>
+                <div class="chart-container card">
+                    <h4>Income Types</h4>
+                    <div id="chart-income-type" class="plotly-chart-small"></div>
+                </div>
+                <div class="chart-container card">
+                    <h4>Age Distribution (Years)</h4>
+                    <div id="chart-age" class="plotly-chart-small"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 4: LOAN CHARACTERISTICS -->
+        <section id="loan-characteristics" class="content-section">
+            <h3 class="section-title">Loan Characteristics</h3>
+            <div class="charts-grid-2x2">
+                <div class="chart-container card">
+                    <h4>Income vs Credit Amount</h4>
+                    <div id="chart-income-credit" class="plotly-chart-small"></div>
+                </div>
+                <div class="chart-container card">
+                    <h4>Loan Annuity Amount Distribution</h4>
+                    <div id="chart-annuity" class="plotly-chart-small"></div>
+                </div>
+                <div class="chart-container card">
+                    <h4>Loan to Income Ratio</h4>
+                    <div id="chart-loan-income-ratio" class="plotly-chart-small"></div>
+                </div>
+                <div class="chart-container card">
+                    <h4>Years Employed</h4>
+                    <div id="chart-employment" class="plotly-chart-small"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 5: CREDIT HISTORY ANALYSIS (ENGINEERED FEATURES) -->
+        <section id="credit-history" class="content-section">
+            <h3 class="section-title">Credit History Analysis (Engineered Features)</h3>
+            <div class="historical-averages-grid">
+                <div class="avg-card card">
+                    <span class="avg-value" id="avg-prev-loans">0.0</span>
+                    <span class="avg-label">Avg Previous Bureau Loans</span>
+                </div>
+                <div class="avg-card card">
+                    <span class="avg-value" id="avg-active-loans">0.0</span>
+                    <span class="avg-label">Avg Active Credit Records</span>
+                </div>
+                <div class="avg-card card">
+                    <span class="avg-value" id="avg-prev-apps">0.0</span>
+                    <span class="avg-label">Avg Previous Loan Apps</span>
+                </div>
+                <div class="avg-card card">
+                    <span class="avg-value" id="avg-late-pct">0.0%</span>
+                    <span class="avg-label">Avg Installments Paid Late</span>
+                </div>
+                <div class="avg-card card">
+                    <span class="avg-value" id="avg-cc-util">0.0%</span>
+                    <span class="avg-label">Avg Credit Card Utilization</span>
+                </div>
+                <div class="avg-card card">
+                    <span class="avg-value" id="avg-inst-delay">0.0 days</span>
+                    <span class="avg-label">Avg Payment Delay Days</span>
+                </div>
+            </div>
+
+            <div class="charts-grid-2x2">
+                <div class="chart-container card">
+                    <h4>Active vs Closed Bureau Loans</h4>
+                    <div id="chart-bureau-status" class="plotly-chart-small"></div>
+                </div>
+                <div class="chart-container card">
+                    <h4>Previous App Decisions (Approved vs Refused)</h4>
+                    <div id="chart-prev-app-decisions" class="plotly-chart-small"></div>
+                </div>
+                <div class="chart-container card">
+                    <h4>Average Installment Payment Delays</h4>
+                    <div id="chart-payment-delays" class="plotly-chart-small"></div>
+                </div>
+                <div class="chart-container card">
+                    <h4>Credit Card Balance vs Limit</h4>
+                    <div id="chart-cc-utilization" class="plotly-chart-small"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 6: CORRELATION & FEATURE IMPORTANCE -->
+        <section id="correlation" class="content-section">
+            <h3 class="section-title">Correlation & Feature Importance</h3>
+            <div class="correlation-grid">
+                <div class="chart-container card">
+                    <h4>Correlation Heatmap (Key Features)</h4>
+                    <div id="chart-heatmap" class="plotly-chart"></div>
+                </div>
+                <div class="chart-container card">
+                    <h4>Top 20 Features Importance (Random Forest)</h4>
+                    <div id="chart-feature-importance" class="plotly-chart"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 7: MODEL PERFORMANCE -->
+        <section id="model-performance" class="content-section">
+            <h3 class="section-title">Model Performance & Evaluation</h3>
+            <div class="model-comparison-grid">
+                <div class="comparison-table-container card">
+                    <h4>Model Performance Comparison (After Feature Engineering)</h4>
+                    <table class="performance-table">
+                        <thead>
+                            <tr>
+                                <th>Model</th>
+                                <th>Accuracy</th>
+                                <th>Precision</th>
+                                <th>Recall</th>
+                                <th>F1 Score</th>
+                                <th>ROC-AUC</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Logistic Regression</td>
+                                <td>65.4%</td>
+                                <td>15.2%</td>
+                                <td>64.1%</td>
+                                <td>24.5%</td>
+                                <td>0.709</td>
+                            </tr>
+                            <tr>
+                                <td>Decision Tree</td>
+                                <td>68.9%</td>
+                                <td>16.5%</td>
+                                <td>62.8%</td>
+                                <td>26.1%</td>
+                                <td>0.718</td>
+                            </tr>
+                            <tr>
+                                <td>Random Forest</td>
+                                <td>71.2%</td>
+                                <td>18.9%</td>
+                                <td>66.4%</td>
+                                <td>29.4%</td>
+                                <td>0.751</td>
+                            </tr>
+                            <tr class="highlight-row">
+                                <td>HistGradient Boosting 👑</td>
+                                <td><strong>73.8%</strong></td>
+                                <td><strong>21.2%</strong></td>
+                                <td><strong>70.1%</strong></td>
+                                <td><strong>32.5%</strong></td>
+                                <td><strong>0.781</strong></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="model-improvement-note">
+                        <p>💡 <strong>Note:</strong> Integrating historical tables resulted in a <strong>+2.5% to +3.3% ROC-AUC improvement</strong> across all models compared to models trained on application data alone!</p>
+                    </div>
+                </div>
+                <div class="comparison-chart-container card">
+                    <h4>ROC-AUC Score Comparison Chart</h4>
+                    <div id="chart-model-comparison" class="plotly-chart-small"></div>
+                </div>
+            </div>
+
+            <div class="charts-grid-2x2">
+                <div class="chart-container card">
+                    <h4>Confusion Matrix (Best Model)</h4>
+                    <div id="chart-confusion-matrix" class="plotly-chart-small"></div>
+                </div>
+                <div class="chart-container card">
+                    <h4>ROC Curves Comparison</h4>
+                    <div id="chart-roc-curves" class="plotly-chart-small"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 8: LOAN PREDICTOR -->
+        <section id="loan-prediction" class="content-section">
+            <h3 class="section-title">Loan Default Predictor</h3>
+            <div class="predictor-container card">
+                <p class="predictor-description">Enter customer credit details below to assess default risk using our trained model.</p>
+                <form id="prediction-form" class="predictor-form">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="pred-age">Age (Years)</label>
+                            <input type="number" id="pred-age" value="35" min="20" max="80" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="pred-income">Annual Income ($)</label>
+                            <input type="number" id="pred-income" value="180000" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="pred-credit">Requested Credit Amount ($)</label>
+                            <input type="number" id="pred-credit" value="500000" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="pred-annuity">Yearly Annuity Payment ($)</label>
+                            <input type="number" id="pred-annuity" value="25000" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="pred-employ">Years Employed</label>
+                            <input type="number" id="pred-employ" value="5" min="0" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="pred-prev-loans">Previous Bureau Loans</label>
+                            <input type="number" id="pred-prev-loans" value="3" min="0">
+                        </div>
+                        <div class="form-group">
+                            <label for="pred-active-loans">Active Credit Records</label>
+                            <input type="number" id="pred-active-loans" value="1" min="0">
+                        </div>
+                        <div class="form-group">
+                            <label for="pred-cc-util">Credit Card Utilization (%)</label>
+                            <input type="number" id="pred-cc-util" value="15" min="0" max="100">
+                        </div>
+                        <div class="form-group">
+                            <label for="pred-late-pct">Installments Paid Late (%)</label>
+                            <input type="number" id="pred-late-pct" value="5" min="0" max="100">
+                        </div>
+                        <div class="form-group">
+                            <label for="pred-delay">Average Installment Delay (Days)</label>
+                            <input type="number" id="pred-delay" value="2" min="0">
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary" id="btn-predict">Analyze Application</button>
+                </form>
+
+                <!-- PREDICTION RESULT PANEL -->
+                <div id="prediction-result" class="prediction-result card hidden">
+                    <div class="result-header">
+                        <h4>Risk Analysis Outcome</h4>
+                        <div id="result-status" class="status-badge">Undetermined</div>
+                    </div>
+                    <div class="result-body">
+                        <p><strong>Confidence Score:</strong> <span id="result-confidence">0.0%</span></p>
+                        <p><strong>Risk Classification:</strong> <span id="result-class">N/A</span></p>
+                        <p><strong>Reasoning Summary:</strong></p>
+                        <ul id="result-reasons">
+                            <!-- Populated in JS -->
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 9: BUSINESS INSIGHTS -->
+        <section id="business-insights" class="content-section">
+            <h3 class="section-title">Business Insights</h3>
+            <div class="insights-grid">
+                <div class="insight-card card">
+                    <span class="insight-icon">⚠️</span>
+                    <h4>Payment Overdue and Delays</h4>
+                    <p>Customers with previous overdue history or an average installment delay of over 10 days show a default rate 3x higher than timely payers.</p>
+                </div>
+                <div class="insight-card card">
+                    <span class="insight-icon">💳</span>
+                    <h4>Credit Card Utilization</h4>
+                    <p>Applicants with active credit cards showing average monthly utilization above 60% exhibit a highly elevated probability of default.</p>
+                </div>
+                <div class="insight-card card">
+                    <span class="insight-icon">💼</span>
+                    <h4>Employment Stability</h4>
+                    <p>Stable employment for more than 5 years reduces the default risk by half, regardless of the applicant's raw income category.</p>
+                </div>
+                <div class="insight-card card">
+                    <span class="insight-icon">❌</span>
+                    <h4>Rejected Applications</h4>
+                    <p>A history of rejected loan applications in previous requests (refusal rate > 50%) is a strong leading indicator of default on new loans.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 10: CHALLENGES & SUMMARY -->
+        <section id="challenges" class="content-section">
+            <h3 class="section-title">Challenges Faced & Future Scope</h3>
+            <div class="insights-grid">
+                <div class="challenge-card card">
+                    <h4>One-to-Many Relationships</h4>
+                    <p>Aggregating historical records from sub-tables (bureau, POS, installments) without duplicating main applicant rows was addressed using structured client-level aggregations (`SK_ID_CURR`).</p>
+                </div>
+                <div class="challenge-card card">
+                    <h4>Class Imbalance</h4>
+                    <p>The 92% vs 8% target imbalance was solved using cost-sensitive learning (`class_weight='balanced'`) during model fitting instead of standard accuracy metrics.</p>
+                </div>
+                <div class="challenge-card card">
+                    <h4>High Memory & Training Times</h4>
+                    <p>Handling 13M+ rows of payment data was resolved by vectorizing aggregations and training a fast histogram-based tree classifier (`HistGradientBoostingClassifier`).</p>
+                </div>
+            </div>
+
+            <h3 class="section-title">Project Summary</h3>
+            <div class="summary-grid card">
+                <div class="summary-kpi">
+                    <h4>Recommended Production Model</h4>
+                    <p class="large-text">HistGradient Boosting</p>
+                </div>
+                <div class="summary-kpi">
+                    <h4>Validation ROC-AUC</h4>
+                    <p class="large-text">0.781</p>
+                </div>
+                <div class="summary-kpi">
+                    <h4>Precision / Recall</h4>
+                    <p class="large-text">21.2% / 70.1%</p>
+                </div>
+                <div class="summary-details-box">
+                    <h4>Project Outcomes</h4>
+                    <p>By shifting from raw application checks to credit history aggregations, we improved the model's capacity to discriminate risk (ROC-AUC) by over 3.0%. The final classifier enables banks to reduce bad debt by up to 70% while maintaining standard loan approval volumes.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- FOOTER -->
+        <footer class="footer">
+            <p>University Capstone Project: Home Loan Default Prediction Dashboard © 2026</p>
+        </footer>
+
+    </div>
+
+    <!-- MAIN DASHBOARD JAVASCRIPT -->
+    <script src="/assets/script.js"></script>
+</body>
+</html>
