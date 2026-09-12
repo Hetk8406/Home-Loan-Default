@@ -10,6 +10,7 @@ An end-to-end Data Science and Machine Learning project designed to predict home
 Home-Loan-Default-Prediction/
 │
 ├── Data/                             # Primary and historical CSV files (ignored in Git)
+├── Home Loan Default/                # Dashboard Application Screenshots
 │
 ├── Home_Loan_Default_Prediction.ipynb # Jupyter Notebook containing EDA, preprocessing, and modeling
 │
@@ -24,7 +25,7 @@ Home-Loan-Default-Prediction/
 │   └── script.js                     # Interactive Plotly plotting and prediction ajax
 │
 ├── templates/                        # HTML templates
-│   └── index.html                    # Dashboard dashboard layout
+│   └── index.html                    # Dashboard layout
 │
 ├── requirements.txt                  # Python dependencies
 └── README.md                         # Project documentation
@@ -61,6 +62,30 @@ Adding historical credit tables yielded an average **+2.5% to +3.3% ROC-AUC impr
 - **Decision Tree**: `0.718`
 - **Random Forest**: `0.751`
 - **HistGradient Boosting**: `0.781` (Recommended)
+
+---
+
+## Dashboard Screenshots
+
+| Project Overview & KPI Metrics | Dataset Overview & Target Distribution |
+| :---: | :---: |
+| ![Dashboard Overview](Home%20Loan%20Default/DS8-Project-1.png) | ![Data Overview](Home%20Loan%20Default/DS8-Project-2.png) |
+
+| Customer Demographics | Loan Characteristics |
+| :---: | :---: |
+| ![Customer Demographics](Home%20Loan%20Default/DS8-Project-3.png) | ![Loan Characteristics](Home%20Loan%20Default/DS8-Project-4.png) |
+
+| Credit History Analysis | Correlation & Feature Importance |
+| :---: | :---: |
+| ![Credit History Analysis](Home%20Loan%20Default/DS8-Project-5.png) | ![Correlation & Feature Importance](Home%20Loan%20Default/DS8-Project-6.png) |
+
+| Model Performance & ROC Curves | Loan Default Risk Predictor |
+| :---: | :---: |
+| ![Model Performance](Home%20Loan%20Default/DS8-Project-7.png) | ![Loan Predictor](Home%20Loan%20Default/DS8-Project-8.png) |
+
+| Business Insights & Project Summary |
+| :---: |
+| ![Business Insights](Home%20Loan%20Default/DS8-Project-9.png) |
 
 ---
 
